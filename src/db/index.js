@@ -1,14 +1,12 @@
-  import mongoose from "mongoose";
-  import express from 'express';
-  import {DB_NAME} from '../constants.js';
-  const app=express()
-
-  const connnectDB= async()=>{
-    try {
-        await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
-        console.log("DB connected")
-    } catch (error) {
-        console.log("Error while connecting",error)
-    }
+import express from 'express';
+import mongoose from 'mongoose';
+import {DB_NAME} from '../constants.js'
+const DBconnect=async()=>{
+  try {
+    await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`);
+    console.log("DB connected successfully");
+  } catch (error) {
+    console.log(error);
   }
-  export default connnectDB
+}
+export default DBconnect;
