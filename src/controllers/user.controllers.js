@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (fullName == " " || email == " " || username == " " || password == " ") {
     throw new ApiError(400, "Fill all details");
   }
-  const existingUser = User.findOne({
+  const existingUser = await User.findOne({
     $or: [{ username }, { email }],
   });
   if (existingUser) {
