@@ -75,20 +75,24 @@ const loginUser=asyncHandler(async(req,res)=>{
    const{email,username,password}=req.body;
    if(!(email || username))
     throw new ApiError(400,"All fields are mendatory");
+
     const user=await User.findOne({
       $or:[{email},{username}]
   })
+
   if(!user) throw new ApiError(401,"Invalid username or email");
   const isPasswordValid=await user.isPasswordCorrect(password);
   if(!isPasswordValid) throw new ApiError(401,"Invalid password");
 
   const {accessToken,refreshToken}=await generateAccessAndRefreshTokens(user._id);
+
   //now send to cookies
   const loggedInUser=await User.findById(user._id).select("-password -refreshToken")
   const options={
     httpOnly:true,
     secure:true
   } // it means cookies cant be modified 
+  
   return res.status(200)
   .cookie("accessToken",accessToken,options)
   .cookie("refreshToken",refreshToken,options)
@@ -141,12 +145,13 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
       secure:true
    } 
    const {accessToken,newRefreshToken}=await generateAccessAndRefreshTokens(user._id);
-   return res.status(200).cookie("accessToken",accessToken).cookie("refreshToken",newRefreshToken).json(new ApiResponse(200,{accessToken,newRefreshToken},"Access token generated successfully"))
+   return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",newRefreshToken,options).json(new ApiResponse(200,{accessToken,newRefreshToken},"Access token refreshed successfully"))
   
   } catch (error) {
     throw new ApiError(401,error?.message || "Invalid refresh Token");
   }
 })
+
 export { registerUser,
          loginUser,
          logoutUser,
